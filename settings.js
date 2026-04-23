@@ -1,7 +1,8 @@
 (function () {
   const collectSettings = () => {
     const instructions = $('#instructions').val()
-    return {instructions};
+    const previewType = $('#previewType').val()
+    return {instructions, previewType};
   }
 
   const exportSettings = () => {
@@ -11,6 +12,7 @@
 
   const applySettings = (settings = {}) => {
     $('#instructions').val(settings.instructions || '');
+    $('#previewType').val(settings.previewType || 'NONE')
   }
 
   const processMessage = (jsonData) => {
