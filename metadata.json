@@ -1,0 +1,15 @@
+{
+  "name": "Free Text",
+  "type": "assessment",
+  "properties": {
+    "type": "free-text",
+    "icon": "./icon.svg",
+    "gradingControls": {
+      "points": true,
+      "allowPartialPoints": true,
+      "definedNumberOfAttempts": true,
+      "rationale": true,
+      "rubrics": true
+    }
+  }
+}
