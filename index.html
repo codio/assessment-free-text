@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Standard code test assessment</title>
+  <script type="module">
+    import {unified} from '//esm.sh/unified@11?bundle'
+    import remarkHtml from '//esm.sh/remark-html@16?bundle'
+    import remarkParse from '//esm.sh/remark-parse@11?bundle'
+    import lodashDebounce from '//cdn.jsdelivr.net/npm/lodash.debounce@4.0.8/+esm'
+
+    window.unified = unified
+    window.remarkHtml = remarkHtml
+    window.remarkParse = remarkParse
+    window.lodashDebounce = lodashDebounce
+  </script>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']],
+        processEscapes: true,
+        autoload: {
+          color: [],
+          colorv2: ['color']
+        },
+        packages: {'[+]': ['noerrors']}
+      },
+      options: {
+        skipHtmlTags: ["script","noscript","style","textarea","pre","code","button"],
+        enableMenu: false,
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
+    };
+  </script>
+  <script defer src="//cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="./index.css">
+  <link type="text/css" rel="stylesheet" href="../assessment-common/assessment.css">
+  <script type="text/javascript" src="../assessment-common/helper.js"></script>
+</head>
+<body>
+  <div class="codio-assessment hide">
+    <h3 class="codio-assessment-name"></h3>
+    <div class="codio-assessment-content">
+      <div class='codio-assessment-instructions'>
+        <div class='instructions-text'></div>
+      </div>
+      <textarea id="answer" class='codio-assessment-textarea' rows="4"></textarea>
+      <div class="codio-assessment-preview-block codio-assessment-help-block"></div>
+    </div>
+    <div class="codio-assessment-guidance-block"></div>
+    <div class="codio-assessment-footer">
+      <button class='unblock-button codio-assessment-button'>Modify answer</button>
+      <button class='check-button codio-assessment-button'></button>
+      <button class='modify-button codio-assessment-button'>Modify answer</button>
+      <button class='reset-button codio-assessment-button'>Reset</button>
+      <button class='grade-button codio-assessment-button'>Grade</button>
+    </div>
+    <div class="codio-assessment-info-block codio-assessment-help-block codio-assessment-help-block--topLeftArrow"></div>
+    <div class="codio-assessment-teacher-comment-block"></div>
+  </div>
+  <script defer type="text/javascript" src="./index.js"></script>
+</body>
+</html>
