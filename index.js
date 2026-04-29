@@ -166,8 +166,7 @@
       processed = processed.replace(/\n/g, '<br/>')
       previewBlock.html(processed)
       previewBlock.removeClass('hide')
-      MathJax.typeset()
-      // todo mathjax render
+      MathJax.typeset([previewBlock])
       return
     }
     try {
@@ -176,8 +175,7 @@
         .use(window.remarkHtml)
         .process(value)
       previewBlock.html(file.value)
-      MathJax.typeset()
-      // todo mathjax render
+      MathJax.typeset([previewBlock])
       previewBlock.removeClass('hide')
     } catch (e) {
       console.error(e)
@@ -259,6 +257,7 @@
     answerTa.val(value)
     const assessmentState = getAssessmentState(value)
     answerTa.prop('readonly', assessmentState.answered || assessmentOptions.showUnblock)
+    answerTa.prop('disabled', assessmentOptions.isDisabled)
 
     renderInfoBlock(value)
     renderTeacherComment()
