@@ -4,6 +4,8 @@
   let processing = false
   let currentData = null
 
+  const taskId = location.hash.substring(1)
+
   const PreviewType = {
     NONE: 'NONE',
     MARKDOWN: 'MARKDOWN',
@@ -169,17 +171,9 @@
       MathJax.typeset([previewBlock])
       return
     }
-    try {
-      const file = await window.unified()
-        .use(window.remarkParse)
-        .use(window.remarkHtml)
-        .process(value)
-      previewBlock.html(file.value)
-      MathJax.typeset([previewBlock])
-      previewBlock.removeClass('hide')
-    } catch (e) {
-      console.error(e)
-    }
+    await renderMd(previewBlock, value)
+    MathJax.typeset([previewBlock])
+    previewBlock.removeClass('hide')
   }
 
   const getInitialValue = () => {
@@ -244,8 +238,84 @@
     infoBlock.removeClass('hide')
   }
 
+  const renderMd = async (container, value) => {
+    try {
+      const file = await window.unified()
+        .use(window.remarkParse)
+        .use(window.remarkHtml)
+        .process(value)
+      container.html(file.value)
+    } catch (err) {
+      console.error(err)
+      return container.html('Error parsing markdown value')
+    }
+  }
+
+  const renderRubricItem = (weight, message) => {
+    const container = $('<div class="codio-assessment-rubric-item"></div>')
+    const numClassSuffix = weight > 0 ? 'plus' : 'minus'
+    const numPrefix = weight > 0 ? '+' : ''
+    const numContainer = $(
+      `<div class="codio-assessment-rubric-item-num-${numClassSuffix}">${numPrefix}${weight}</div>`
+    )
+    container.append(numContainer)
+    const messageContainer = $('<div class="codio-assessment-rubric-item-message"></div>')
+    renderMd(messageContainer, message)
+    container.append(messageContainer)
+    return container
+  }
+
+  const renderRubrics = (container, assessmentRubrics, assignmentRubrics) => {
+    const assignmentRubricsMap = {}
+    assignmentRubrics.rubricsList.forEach(rubric => {
+      assignmentRubricsMap[rubric.uuid] = rubric
+    })
+
+    const items = (assessmentRubrics?.rubrics ?? []).filter(rubricId => {
+      const rubricItem = assignmentRubricsMap[rubricId]
+      const {correctId, incorrectId} = assignmentRubrics
+      return rubricItem && rubricItem.uuid !== correctId && rubricItem.uuid !== incorrectId
+    }).sort((a, b) => {
+      const indexA = assignmentRubrics.rubricsList.findIndex(item => item.uuid === a)
+      const indexB = assignmentRubrics.rubricsList.findIndex(item => item.uuid === b)
+      return indexA - indexB
+    })
+
+    if (!assessmentRubrics.comments && !assignmentRubrics.adjustValue && items.length === 0) {
+      return
+    }
+
+    container.append('<div class="codio-assessment-rubrics-title">Grade details:</div>')
+    const rubricsInfoContainer = $('<div class="codio-assessment-rubrics-info"></div>')
+    if (assessmentRubrics.comments) {
+      const commentsContainer = $('<div class="codio-assessment-rubrics-comments"></div>')
+      renderMd(commentsContainer, assessmentRubrics.comments)
+      rubricsInfoContainer.append(commentsContainer)
+    }
+    items.forEach((id) => {
+      const rubricItem = assignmentRubricsMap[id]
+      rubricsInfoContainer.append(renderRubricItem(-rubricItem.weight, rubricItem.message))
+    })
+    if (assessmentRubrics.adjustValue) {
+      rubricsInfoContainer.append(renderRubricItem(assessmentRubrics.adjustValue, 'Points adjust'))
+    }
+    container.append(rubricsInfoContainer)
+  }
+
   const renderTeacherComment = () => {
-    // todo render comment
+    const container = $('.codio-assessment-teacher-comment-block')
+    container.addClass('hide')
+    container.empty()
+
+    const {eduStartedAssignment, assignmentRubrics} = currentData.options
+
+    const rubrics = eduStartedAssignment?.started?.rubrics
+    const assessmentRubrics = rubrics ? rubrics[taskId] : null
+    if (!assessmentRubrics) {
+      return null
+    }
+    renderRubrics(container, assessmentRubrics, assignmentRubrics)
+    container.removeClass('hide')
   }
 
   const refreshResultsAndFooter = (initialValue) => {
