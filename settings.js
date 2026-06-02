@@ -1,8 +1,12 @@
 (function () {
   const collectSettings = () => {
+    const errors = []
     const instructions = $('#instructions').val()
     const previewType = $('#previewType').val()
-    return {instructions, previewType};
+
+    !instructions && errors.push('Instructions field must be completed');
+
+    return {data: {instructions, previewType}, errors};
   }
 
   const exportSettings = () => {
